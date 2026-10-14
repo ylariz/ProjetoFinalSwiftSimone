@@ -27,33 +27,35 @@ struct TelaCarrossel: View {
                 ScrollView(.horizontal){
                     HStack(spacing: 16){
                         ForEach(viewModel.musicasGet){ musica in
-                            VStack(spacing: 12){
-                                AsyncImage(url: URL(string: musica.capaURL)) { fase in
-                                    switch fase {
-                                    case .empty:
-                                        ProgressView()
-                                    case .success(let imagem):
-                                        imagem
-                                            .resizable()
-                                            .scaledToFill()
-                                    case .failure:
-                                        Image(systemName: "music.note")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 80, height: 80)
-                                            .foregroundStyle(.gray)
-                                    @unknown default:
-                                        EmptyView()
+                            NavigationLink(value: musica){
+                                VStack(spacing: 12){
+                                    AsyncImage(url: URL(string: musica.capaURL)) { fase in
+                                        switch fase {
+                                        case .empty:
+                                            ProgressView()
+                                        case .success(let imagem):
+                                            imagem
+                                                .resizable()
+                                                .scaledToFill()
+                                        case .failure:
+                                            Image(systemName: "music.note")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 80, height: 80)
+                                                .foregroundStyle(.gray)
+                                        @unknown default:
+                                            EmptyView()
+                                        }
                                     }
+                                    .frame(width: 240, height: 240)
+                                    .background(Color(red: 0.80, green: 0.76, blue: 0.89))
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    
+                                    Text(musica.nome)
+                                        .font(.custom("Georgia", size: 22))
+                                        .foregroundStyle(Color(red: 0.25, green: 0.20, blue: 0.15))
+                                        .lineLimit(1)
                                 }
-                                .frame(width: 240, height: 240)
-                                .background(Color(red: 0.80, green: 0.76, blue: 0.89))
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                
-                                Text(musica.nome)
-                                    .font(.custom("Georgia", size: 22))
-                                    .foregroundStyle(Color(red: 0.25, green: 0.20, blue: 0.15))
-                                    .lineLimit(1)
                             }
                             .frame(width: 240)
                         
@@ -80,6 +82,9 @@ struct TelaCarrossel: View {
         .background(Color(red: 0.95, green: 0.94, blue: 0.98))
         .task {
             await viewModel.buscarMusicas(termo: artista.termoBusca)
+        }
+        .navigationDestination(for: Musica.self){ musica in
+            TelaDetalhes(musica:musica)
         }
     }
 }
