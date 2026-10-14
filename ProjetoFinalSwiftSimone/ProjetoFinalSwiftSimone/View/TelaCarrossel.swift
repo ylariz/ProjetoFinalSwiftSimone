@@ -28,14 +28,27 @@ struct TelaCarrossel: View {
                     HStack(spacing: 16){
                         ForEach(viewModel.musicasGet){ musica in
                             VStack(spacing: 12){
-                                Image(systemName: "music.note")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 80, height: 80)
-                                    .foregroundStyle(.gray)
-                                    .frame(width: 240,height: 240)
-                                    .background(Color(red: 0.80, green: 0.76, blue: 0.89))
-                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                AsyncImage(url: URL(string: musica.capaURL)) { fase in
+                                    switch fase {
+                                    case .empty:
+                                        ProgressView()
+                                    case .success(let imagem):
+                                        imagem
+                                            .resizable()
+                                            .scaledToFill()
+                                    case .failure:
+                                        Image(systemName: "music.note")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 80, height: 80)
+                                            .foregroundStyle(.gray)
+                                    @unknown default:
+                                        EmptyView()
+                                    }
+                                }
+                                .frame(width: 240, height: 240)
+                                .background(Color(red: 0.80, green: 0.76, blue: 0.89))
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
                                 
                                 Text(musica.nome)
                                     .font(.custom("Georgia", size: 22))
@@ -47,7 +60,7 @@ struct TelaCarrossel: View {
                         }
                     }
                     .scrollTargetLayout()
-                
+                //.background(Color(red: 0.80, green: 0.76, blue: 0.89))
                 
                 }
                 .scrollTargetBehavior(.viewAligned)
